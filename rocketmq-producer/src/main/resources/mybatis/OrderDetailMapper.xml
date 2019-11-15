@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.rocketmq.producer.mapper.OrderDetailMapper">
+
+    <insert id="insert" parameterType="com.example.rocketmq.producer.bean.OrderDetail">
+       insert into order_detail (id, order_id, product_id, product_name,
+          product_price, product_mode_desc, product_mode_params,
+          number, subtotal, remark
+          )
+        values (#{id,jdbcType=BIGINT},
+          #{orderId,jdbcType=BIGINT},
+          #{productId,jdbcType=INTEGER},
+          #{productName,jdbcType=VARCHAR},
+          #{productPrice,jdbcType=DECIMAL},
+          #{productModeDesc,jdbcType=VARCHAR},
+          #{productModeParams,jdbcType=VARCHAR},
+          #{number,jdbcType=INTEGER},
+          #{subtotal,jdbcType=DECIMAL},
+          #{remark,jdbcType=VARCHAR}
+          )
+    </insert>
+
+    <sql id="base_column_list">
+          id, order_id as orderId, product_id as productId, product_name as productName,
+          product_price as productPrice, product_mode_desc as productModeDesc,
+          product_mode_params as productModeParams,
+          number, subtotal, remark
+    </sql>
+
+    <select id="selectById" parameterType="Long"
+            resultType="com.example.rocketmq.producer.bean.OrderDetail">
+      select
+      <include refid="base_column_list"/>
+      from `order_detail`
+      where id=#{id}
+    </select>
+
+    <select id="selectByOrderId" parameterType="Long"
+            resultType="com.example.rocketmq.producer.bean.OrderDetail">
+        select
+        <include refid="base_column_list"/>
+        from `order_detail`
+        where order_id=#{orderId}
+    </select>
+
+</mapper>

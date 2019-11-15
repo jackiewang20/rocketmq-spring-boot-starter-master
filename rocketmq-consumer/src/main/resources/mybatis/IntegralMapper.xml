@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.rocketmq.consumer.mapper.IntegralMapper">
+
+    <insert id="insert" parameterType="com.example.rocketmq.consumer.bean.Integral">
+      insert into integral(id,number,type,user_id)
+          values(
+            #{id,jdbcType=INTEGER},
+            #{number,jdbcType=INTEGER},
+            #{type,jdbcType=INTEGER},
+            #{userId,jdbcType=INTEGER}
+          )
+    </insert>
+
+    <update id="updateById" parameterType="com.example.rocketmq.consumer.bean.Integral">
+      update integral
+      <set>
+          <if test="number != null">
+              number = #{number,jdbcType=INTEGER},
+          </if>
+          <if test="type != null">
+              type = #{type,jdbcType=INTEGER},
+          </if>
+          <if test="userId != null">
+              user_id = #{userId,jdbcType=INTEGER},
+          </if>
+      </set>
+      where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <update id="addIntegralWithUserId" parameterType="com.example.rocketmq.consumer.bean.Integral">
+        update integral
+          set number = number + #{number}
+          where user_id = #{userId}
+    </update>
+
+    <sql id="select_column_list">
+        id, number, type, user_id
+    </sql>
+
+    <resultMap id="selectResultMap" type="com.example.rocketmq.consumer.bean.Integral">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="number" property="number" jdbcType="INTEGER"/>
+        <result column="type" property="type" jdbcType="INTEGER"/>
+        <result column="user_id" property="userId" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="selectById" parameterType="Integer" resultMap="selectResultMap">
+        select
+        <include refid="select_column_list"/>
+        from integral
+        where id = #{id}
+    </select>
+
+</mapper>

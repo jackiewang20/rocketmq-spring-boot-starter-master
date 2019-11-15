@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.rocketmq.producer.mapper.OrderMapper">
+
+    <!-- order为mysql关键词，需要使用``引用起来 -->
+    <insert id="insert" parameterType="com.example.rocketmq.producer.bean.Order">
+      <selectKey resultType="java.lang.Long" keyProperty="id" order="AFTER">
+          SELECT LAST_INSERT_ID()
+      </selectKey>
+      insert into `order` (id, order_code,order_no, shop_id,
+          order_status, order_amount, create_time,
+          user_id)
+        values (#{id,jdbcType=BIGINT},
+          #{orderCode,jdbcType=VARCHAR},
+          #{orderNo,jdbcType=VARCHAR},
+          #{shopId,jdbcType=INTEGER},
+          #{orderStatus,jdbcType=INTEGER},
+          #{orderAmount,jdbcType=DECIMAL},
+          #{createTime,jdbcType=TIMESTAMP},
+          #{userId,jdbcType=INTEGER})
+
+    </insert>
+
+    <sql id="base_column_list">
+        id, order_no as orderNo, shop_id as shopId, order_status as orderStatus
+        , order_amount as orderAmount, create_time as createTime, user_id as userId
+    </sql>
+
+    <select id="selectByUserId" parameterType="Order" resultType="Order">
+      select
+      <include refid="base_column_list"/>
+      from `order`
+      where user_id=#{userId}
+    </select>
+
+    <select id="selectByOrderNo" parameterType="com.example.rocketmq.producer.bean.Order"
+            resultType="com.example.rocketmq.producer.bean.Order">
+        select
+        <include refid="base_column_list"/>
+        from `order`
+        where order_no=#{orderNo}
+    </select>
+
+</mapper>

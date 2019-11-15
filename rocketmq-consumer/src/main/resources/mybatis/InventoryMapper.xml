@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.example.rocketmq.consumer.mapper.InventoryMapper">
+
+    <insert id="insert" parameterType="com.example.rocketmq.consumer.bean.Inventory">
+        insert into inventory(id, number, channel_no, product_id)
+            values (
+              #{id},
+              #{number},
+              #{channelNo},
+              #{productId}
+            )
+    </insert>
+
+    <update id="updatebyId" parameterType="com.example.rocketmq.consumer.bean.Inventory">
+        update inventory
+        <set>
+            <if test="number != null">
+                number = #{number},
+            </if>
+            <if test="channelNo != null">
+                channel_no = #{channelNo},
+            </if>
+            <if test="productId != null">
+                product_id = #{productId}
+            </if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="subtractInventoryByProductId" parameterType="com.example.rocketmq.consumer.bean.Inventory">
+        update inventory
+          set number = number - #{number}
+          where product_id = #{productId} and number >= #{number}
+    </update>
+
+    <sql id="select_column_list">
+        id, number, channel_no, product_id
+    </sql>
+
+    <resultMap id="selectResultMap" type="com.example.rocketmq.consumer.bean.Inventory">
+        <id column="id" property="id"/>
+        <result column="number" property="number"/>
+        <result column="channel_no" property="channelNo"/>
+        <result column="product_id" property="productId"/>
+    </resultMap>
+
+    <select id="selectByProductId" parameterType="Integer" resultMap="selectResultMap">
+        select
+        <include refid="select_column_list"/>
+        from inventory
+        where product_id = #{productId}
+    </select>
+
+    <select id="selectById" parameterType="Integer" resultMap="selectResultMap">
+        select
+        <include refid="select_column_list"/>
+        from inventory
+        where id = #{id}
+    </select>
+
+</mapper>

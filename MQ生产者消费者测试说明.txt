@@ -1,0 +1,80 @@
+1.自动配置rocketmq-spring-boot-starter
+    该项目中的application.properties属性作为rocketmq测试使用，测试设置断点，然后debug。
+
+2.生产者rocketmq-producer
+
+    （1）首先引用自动配置子模块rocketmq-spring-boot-starter
+            <dependency>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <groupId>com.example</groupId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+    （2）配置生产者相关属性配置
+    参考application-rocketmq.properties
+
+    （3）生产者生产消息
+    发送消息测试类ProducerController
+        sendMsg()               发送普通消息；
+        sendTransactionMsg()    发送事务消息，执行本地事务，同时注册事务监听器；
+
+    TransactionListenerImpl
+        包含executeLocalTransaction()和checkLocalTransaction()，执行本地事务和消息回查。
+
+    SpringInitUtil              spring初始化操作。
+
+    （4）运行启动类
+    在启动类中导入rocketmq-spring-boot-starter包。
+
+
+3.消费者rocketmq-consumer
+
+    （1）首先引用自动配置子模块rocketmq-spring-boot-starter
+            <dependency>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <groupId>com.example</groupId>
+                <version>1.0-SNAPSHOT</version>
+            </dependency>
+
+    （2）配置消费者相关属性配置
+    参考application-rocketmq.properties
+
+    （3）消费者消费消息
+    消费消息ConsumerComponent
+        RocketmqMsgListen(RocketmqEvent event)方法使用了@EventListener(condition = "...")注解启动消费消息，
+        该方法为自定义实现消费消息，兼容消费PUSH和PULL模式消息。
+
+    以PULL模式拉取消息ConsumerPullComponent
+
+
+    （4）运行启动类
+    在启动类中导入rocketmq-spring-boot-starter包
+
+
+4.测试
+    注意：多个消费者不论PULL模式或者PUSH模式，可能不属于同一组的，建议producer生成数据投递到不同的topic中的不同tag下，
+    consumer安装producer投递消息的方式消费数据，这样可以划分业务处理。
+
+    另外这里生成数据创建订单，由于订单号不能重复，所以每次创建订单要保证订单号唯一。
+
+    (1)访问
+    http://localhost:8080/producer/sendMsg
+    http://localhost:8080/producer/sendTransactionMsg
+    然后分别查看生产者和消费者控制台输出。
+
+    (2)消息发送失败异常测试
+    》自动配置逻辑部分错误测试
+    开启 MQConsumerAutoConfiguration 中的异常测试代码：
+                    if(true){
+                        throw new RuntimeException("[PUSH消息事件处理]抛异常测试，支持集群模式。");
+                    }
+    然后重新生产者和消费者服务。
+
+    》消费者消费异常测试
+    开启 ComsumerComponent 中RocketmqMsgListen方法的异常测试代码：
+            if(true){
+                throw new RuntimeException("[consumer]消费PUSH消息，抛异常测试，支持集群模式。");
+            }
+    然后重启生产者和消费者服务。
+
+    注意：为了方便测试，MQConsumerAutoConfiguration和ComsumerComponent中的异常测试代码不要同时开启。

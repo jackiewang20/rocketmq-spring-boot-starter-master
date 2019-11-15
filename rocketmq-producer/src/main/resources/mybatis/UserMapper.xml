@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+	<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.example.rocketmq.producer.mapper.UserMapper">
+	<insert id="insert" parameterType="com.example.rocketmq.producer.bean.User">
+		insert into user(id, name, create_time)
+			values(
+				#{id, jdbcType=INTEGER},
+				#{name, jdbcType=VARCHAR},
+				#{createTime, jdbcType=TIMESTAMP}
+			)
+	</insert>
+
+	<!-- 由于user bean属性createTime，数据库user表字段create_time，
+	查询create_time列返回空值， 使用resultMap作为返回类型;
+	除了以上方式解决以外，可以使用别名解决。 -->
+<!-- 	<select id="findById" resultType="com.example.bean.User" parameterType="java.lang.Integer">
+		select * from user where id = #{id}		
+	</select> -->
+	
+	<select id="findById" resultMap="baseResultMap"
+		parameterType="java.lang.Integer">
+		select
+			<include refid="base_column_list"/>
+		from user
+			where id=#{id, jdbcType=INTEGER}
+	</select>
+
+	<sql id="base_column_list">
+		id, name, create_time
+	</sql>
+	
+	<resultMap type="com.example.rocketmq.producer.bean.User" id="baseResultMap">
+		<id column="id" property="id" jdbcType="INTEGER"/>
+		<result column="name" property="name" jdbcType="VARCHAR"/>
+		<result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+	</resultMap>
+
+</mapper>
