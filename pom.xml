@@ -42,7 +42,7 @@
         <rocketmq.version>4.3.0</rocketmq.version>
         <aopalliance.version>1.0</aopalliance.version>
         <aspectjweaver.version>1.8.9</aspectjweaver.version>
-        <mysql-connector-java.version>5.1.47</mysql-connector-java.version>
+        <mysql-connector-java.version>8.0.28</mysql-connector-java.version>
         <lombok.version>1.16.22</lombok.version>
     </properties>
 
